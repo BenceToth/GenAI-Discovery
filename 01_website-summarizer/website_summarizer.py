@@ -64,15 +64,28 @@ class WebsiteSummarizer:
         except Exception as e:
             raise Exception(f"Error parsing website: {e}")
     
-    def summarize(self, url, show_thinking=False):
+    def summarize(self, url, show_thinking=False, verbose=False):
         """Summarize a website."""
         try:
+            if verbose:
+                print(f"🌐 Fetching: {url}")
+                print(f"🤖 Using model: {self.model}")
+                print(f"🔗 API endpoint: {self.api_url}")
+                print("📝 Generating summary...")
+            
             title, content = self._fetch_website(url)
             
+            if verbose:
+                print(f"📄 Title: {title}")
+                print(f"📃 Content preview (first 500 chars): {content[:500]}...")
+                print(f"📏 Total content length: {len(content)} characters")
+            
             messages = [
-                {"role": "system", "content": """Analyze website content and provide a concise markdown of key news summarized.
-                    State exact details for the top articles, not just general topics discussed.
-                    Avoid vague summaries like "Climate-related events affecting ecosystems and economies"; be specific."""},
+                {"role": "system", "content": """You are a precise content analyzer. ONLY summarize what is actually present in the provided website content. 
+                DO NOT make up, infer, or hallucinate any information not explicitly stated in the content.
+                If the content is minimal or unclear, state that clearly.
+                Provide exact quotes from the content when possible.
+                If there are no specific articles or news items, say so."""},
                 {"role": "user", "content": f"Website: {title}\n\nContent:\n{content}"}
             ]
             
@@ -133,7 +146,7 @@ Examples:
             print("📝 Generating summary...")
         
         # Generate summary
-        summary = summarizer.summarize(args.url, show_thinking=args.thinking)
+        summary = summarizer.summarize(args.url, show_thinking=args.thinking, verbose=args.verbose)
         
         # Output results
         if args.output:
