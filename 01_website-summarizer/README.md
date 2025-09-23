@@ -1,22 +1,78 @@
 # Website Summarizer
 
-This folder contains the notebook for the **Website Summarizer** project. The main file is:
+AI-powered website content summarization with multiple implementation approaches. Choose between functional, OOP, or command-line versions.
 
-- `website-summarizer.ipynb`: This Jupyter notebook provides an implementation for summarizing website content using generative AI techniques. It demonstrates how to extract, process, and summarize information from web pages, making it useful for quickly understanding large amounts of online content.
+## Quick Start
 
-## Purpose
+1. **Setup:**
+   ```bash
+   pip install -r requirements.txt
+   # For DeepSeek
+   ollama pull deepseek-r1:1.5b && ollama serve
+   # OR for OpenAI
+   echo "OPENAI_API_KEY=your_key_here" > .env
+   ```
 
-The goal of the Website Summarizer is to leverage AI models to automatically generate concise summaries of website text. This can be helpful for research, content curation, or improving productivity by reducing the time needed to read and interpret web resources.
+2. **Use:**
+   ```bash
+   # Command line
+   python3 website_summarizer.py https://cnn.com
+   
+   # Jupyter notebook
+   jupyter lab website-summarizer_basic.ipynb
+   jupyter lab website-summarizer.ipynb
+   ```
 
-## Usage
+## Files & Implementations
 
-To use the notebook:
-1. Open `website-summarizer.ipynb` in JupyterLab or another compatible environment.
-2. Follow the instructions in the notebook to input a website URL and generate a summary.
+| File | Approach | Best For | Features |
+|------|----------|----------|----------|
+| `website-summarizer_basic.ipynb` | **Functional** | Learning, quick prototyping | OpenAI/Ollama support, simple setup |
+| `website-summarizer.ipynb` | **Object-Oriented** | Production, maintainability | DeepSeek thinking filter, clean architecture |
+| `website_summarizer.py` | **Command-Line** | Automation, scripting | CLI args, batch processing, file output |
+
+### Implementation Differences
+
+**Basic Implementation:**
+- ✅ Functions-based approach
+- ✅ OpenAI API + Ollama compatibility  
+- ✅ Simple `.env` setup
+- ✅ Beginner-friendly
+- ❌ No thinking process filtering
+
+**OOP Implementation:**
+- ✅ Class-based architecture
+- ✅ DeepSeek thinking process filtering
+- ✅ Better error handling
+- ✅ Extensible design
+- ❌ DeepSeek/Ollama only
+
+**Command-Line Tool:**
+- ✅ Terminal automation ready
+- ✅ Advanced CLI options
+- ✅ File output capabilities
+- ✅ Verbose debugging modes
+- ❌ No interactive interface
 
 ## Dependencies
 
-Please refer to the notebook for required Python packages and setup instructions.
+`requirements.txt`: `requests`, `beautifulsoup4`, `openai`, `python-dotenv`
+
+## Usage Examples
+
+```bash
+# CLI with advanced options
+python3 website_summarizer.py https://reuters.com --verbose --output news.md
+
+# Basic notebook (OpenAI)
+display_summary("https://bbc.com")
+
+# OOP notebook (DeepSeek)
+summarizer = WebsiteSummarizer(API, MODEL, HEADERS)
+summarizer.display("https://bbc.com")
+```
+
+Choose the implementation that best fits your needs: **Basic** for learning, **OOP** for production, **CLI** for automation.
 
 ---
 *Repository: [BenceToth/GenAI-Discovery](https://github.com/BenceToth/GenAI-Discovery)*
