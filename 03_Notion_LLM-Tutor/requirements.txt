@@ -1,0 +1,7 @@
+openai
+ollama
+notion-client
+notion-exporter
+python-dotenv
+nest_asyncio
+ipython
