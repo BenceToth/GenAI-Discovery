@@ -1,0 +1,21 @@
+# Marketing Brochure Generator Requirements
+# Core dependencies for web scraping and AI-powered brochure generation
+
+# OpenAI API client for GPT-4o-mini integration
+openai>=1.0.0
+
+# Web scraping and HTTP requests
+requests>=2.28.0
+beautifulsoup4>=4.11.0
+
+# Environment variable management
+python-dotenv>=0.19.0
+
+# Jupyter notebook support for interactive development
+ipython>=8.0.0
+
+# Standard library packages (included with Python)
+# warnings - built-in
+# os - built-in  
+# json - built-in
+# typing - built-in (Python 3.5+)
