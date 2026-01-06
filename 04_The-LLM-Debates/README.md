@@ -6,7 +6,7 @@ This project simulates a lively debate between three renowned figures on the top
 
 - **🦞 Jordan Peterson** (using `gpt-5-nano`): Advocates for responsibility and structure.
 - **🩹 Gabor Maté** (using `gpt-5-mini`): Emphasizes emotional connection and understanding trauma.
-- **🌟 Carol Dweck** (using `gpt-4.1-mini`): Promotes resilience and the growth mindset.
+- **🌱 Carol Dweck** (using `gpt-4.1-mini`): Promotes resilience and the growth mindset.
 
 ## How It Works
 
