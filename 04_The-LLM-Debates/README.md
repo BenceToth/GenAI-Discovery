@@ -26,11 +26,6 @@ This project simulates a lively debate between three renowned figures on the top
 2. Install the required dependencies using `pip install -r requirements.txt`.
 3. Open the notebook `the-llm-debates.ipynb` and run the cells to simulate the debate.
 
-## Notes
-
-- The models used are subject to availability and may need to be updated if deprecated.
-- The emojis represent the personas for better visualization.
-
 ## Disclaimer
 
 - The personas in this project are fictional and do not represent the actual thoughts, beliefs, or opinions of the real individuals they are based on.
