@@ -80,3 +80,5 @@ http://127.0.0.1:7861
 - `youtube_scraper.py` — data-fetching utility
 - `parlamentai_app.py` — web UI
 - `parlamentai.ipynb` — notebook prototype
+
+<img width="1224" height="685" alt="image" src="https://github.com/user-attachments/assets/692e48be-6ef1-408b-b2ce-5561d7224bef" />
