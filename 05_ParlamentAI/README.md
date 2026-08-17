@@ -1,66 +1,82 @@
-# ParlamentAI Notebook
+# ParlamentAI
 
-A Jupyter notebook that fetches a YouTube transcript of a Hungarian parliamentary session and uses OpenAI to produce meeting minutes (summary, discussion points, takeaways, and action items) in English.
+ParlamentAI is a small workflow for fetching Hungarian parliamentary YouTube videos, extracting transcripts, and generating concise meeting minutes with OpenAI. The project includes a notebook, a scraper utility, and a Gradio web app.
+
+## Project files
+
+- `parlamentai.ipynb` — notebook-based exploration and prototype workflow.
+- `youtube_scraper.py` — fetches YouTube channel video metadata and transcript text.
+- `parlamentai_app.py` — Gradio interface for selecting a parliament video and generating a summary.
+- `requirements.txt` — Python dependencies for the notebook, scraper, and app.
 
 ## Features
 
-- Download transcripts from YouTube using `youtube-transcript-api`.
-- Clean and combine transcript snippets into a single text block.
-- Build a prompt and call OpenAI's `gpt-4o-mini` model via streaming to produce minutes in Markdown (no code blocks).
-- Simple API-key format check and streaming display in notebook cells.
-
-## Contents
-
-- `parlamentai.ipynb` — the main notebook demonstrating transcript retrieval and LLM-powered minutes generation.
-
-## Quick start
-
-1. Open a terminal and create a virtual environment (recommended):
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install --upgrade pip
-```
-
-2. Install dependencies:
-
-```bash
-pip install youtube-transcript-api python-dotenv openai
-```
-
-3. Place your OpenAI API key in a `.env` file located in the parent directory of the notebook (the notebook loads env from the parent folder). Example `.env`:
-
-```env
-OPENAI_API_KEY=sk-...
-```
-
-4. Open the notebook `parlamentai.ipynb` in VS Code or Jupyter and run the cells.
+- Query a YouTube channel for recent broadcast or upload videos.
+- Extract a video transcript from YouTube using `youtube-transcript-api`.
+- Summarize the transcript into meeting minutes with `gpt-4o-mini`.
+- View the generated output in a simple Gradio UI.
+- Keep the workflow focused on the official Hungarian Parliament channel `@OrszaggyulesELO`.
 
 ## Environment variables
 
-- `OPENAI_API_KEY` — required. The notebook includes a basic format check to help spot incorrect key values.
+Create a `.env` file in the parent project directory, next to this folder, with:
 
-## Notes on behavior
+```env
+OPENAI_API_KEY=sk-...
+YOUTUBE_API_KEY=YOUR_YOUTUBE_DATA_API_KEY
+```
 
-- The notebook detects available transcript language tracks and selects the first language it finds (the example video uses Hungarian). The generated minutes are produced in English regardless of the transcript language.
-- The notebook streams model output into the notebook display for progressive rendering.
+## Install dependencies
+
+```bash
+cd Udemy_Agentic-AI/GenAI-Discovery/05_ParlamentAI
+python -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+## Run the notebook
+
+Open `parlamentai.ipynb` in VS Code or Jupyter and run the cells in order.
+
+## Run the Gradio app
+
+From the project directory:
+
+```bash
+python parlamentai_app.py
+```
+
+Then open the local URL printed in the terminal, usually:
+
+```text
+http://127.0.0.1:7861
+```
+
+## How the scraper works
+
+`youtube_scraper.py`:
+
+- looks up the channel ID from a handle such as `@OrszaggyulesELO`
+- searches for recent live broadcasts or recent videos
+- returns titles, video IDs, and URLs
+- extracts transcript text for the selected video
 
 ## Security and secret handling
 
-- Do NOT commit `.env` or any API keys to the repository. Clear any notebook outputs containing secrets before committing.
-- If a secret was accidentally committed, rotate it immediately and remove it from history.
+- Never commit `.env` files to version control.
+- Do not commit notebooks or terminal output that contains API keys.
+- Rotate keys immediately if they are exposed accidentally.
 
 ## Troubleshooting
 
-- If transcript retrieval fails, confirm the `VIDEO_ID` is correct and that the video has a transcript available (auto-generated tracks may be limited).
-- If the OpenAI call fails, confirm `OPENAI_API_KEY` is valid and that you have network access. Check the API key prefix and rotate the key if necessary.
+- If the selector is empty, confirm that `YOUTUBE_API_KEY` is present and valid.
+- If transcripts fail, confirm the YouTube video has an available transcript.
+- If the OpenAI call fails, verify that `OPENAI_API_KEY` is valid and has sufficient quota.
 
-## Extending this notebook
+## Related files
 
-- Add language selection or multi-track merging to combine several language tracks.
-- Chunk very long transcripts and summarize in sections to avoid token limits.
-
-----
-
-Notebook: parlamentai.ipynb — located alongside this README.
+- `youtube_scraper.py` — data-fetching utility
+- `parlamentai_app.py` — web UI
+- `parlamentai.ipynb` — notebook prototype

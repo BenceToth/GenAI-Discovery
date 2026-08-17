@@ -1,5 +1,7 @@
 youtube-transcript-api>=0.12.0
 python-dotenv>=1.0.0
 openai>=1.0.0
+gradio>=4.0.0
+certifi>=2024.0.0
 ipython>=8.0.0
 jupyter>=1.0.0

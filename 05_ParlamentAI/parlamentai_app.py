@@ -5,53 +5,28 @@ from youtube_transcript_api import YouTubeTranscriptApi
 from openai import OpenAI
 import gradio as gr
 
+from youtube_scraper import fetch_broadcasts, fetch_transcript
 
-# Load environment from parent directory (matches notebook behavior)
+
+# Load APIs from .env
 BASE_DIR = os.path.dirname(__file__)
 PARENT_ENV = os.path.join(os.path.dirname(BASE_DIR), ".env")
 load_dotenv(dotenv_path=PARENT_ENV, override=True)
 
+YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+if not YOUTUBE_API_KEY:
+    raise RuntimeError("YOUTUBE_API_KEY not found in environment. Please create a .env file with the key.")
+
 if not OPENAI_API_KEY:
     raise RuntimeError("OPENAI_API_KEY not found in environment. Please create a .env file with the key.")
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 MODEL_GPT = "gpt-4o-mini"
 
-
-def extract_video_id(url: str) -> str:
-    """Extract YouTube video id from a URL or return the text if it's already an id."""
-    if not url:
-        raise ValueError("Empty URL")
-    # Original notebook logic: take 11 chars after 'v='
-    if 'v=' in url:
-        idx = url.split('v=')[1]
-        return idx[:11]
-    # fallback: if it's already 11 chars assume it's the id
-    if len(url.strip()) == 11:
-        return url.strip()
-    raise ValueError("Could not extract a YouTube video id from the provided URL. Provide a URL containing 'v=' or the 11-char id.")
-
-
-def fetch_transcript(video_url: str) -> str:
-    video_id = extract_video_id(video_url)
-    yt = YouTubeTranscriptApi()
-    transcripts = yt.list(video_id=video_id)
-    if not transcripts:
-        raise RuntimeError("No transcripts available for this video")
-    
-    # get first language code and fetch transcript
-    lang_code = list(transcripts)[0].language_code
-    transcript_obj = transcripts.find_transcript([lang_code])
-    transcript_data = transcript_obj.fetch()
-    
-    full_transcript_text = " ".join([entry.text for entry in transcript_data])
-    
-    # limit size to avoid token issues
-    if len(full_transcript_text) > 12000:
-        full_transcript_text = full_transcript_text[:12000] + "\n\n[Truncated transcript due to length]"
-    return full_transcript_text
-
+# YouTube channel to fetch videos from. This is the official channel of the Hungarian Parliament.
+CHANNEL_HANDLE = "@OrszaggyulesELO"
 
 def generate_minutes(transcript: str):
     system_message = (
@@ -102,16 +77,23 @@ Transcription:
             yield text
 
 
-def summarize_url(url: str):
-    # This function is a generator to stream updates to the UI.
-    if not url:
-        yield gr.update(visible=True, value="Please enter a YouTube URL or video id."), ""
-        return
+def load_video_choices(channel_handle: str):
+    """Fetches the latest live broadcasts for a given YouTube channel handle and returns a list of choices for a dropdown menu."""
+    try:
+        videos = fetch_broadcasts(channel_handle, max_results=14)
+        choices = [v['title'] for v in videos]
+        selected = videos[0]["video_id"]
+        return gr.update(choices=choices, value=selected, visible=True), gr.update(value=f"Loaded {len(videos)} live videos.", visible=True)
+    except Exception as e:
+        return gr.update(choices=[], value=None, visible=False), gr.update(value=f"Error loading videos: {e}", visible=True)
 
-    # Show status field only after the button click starts the process
+
+def summarize_url(video_id: str):
+    video_url = f"https://www.youtube.com/watch?v={video_id}"
+
     yield gr.update(visible=True, value="Fetching transcript..."), ""
     try:
-        transcript = fetch_transcript(url)
+        transcript = fetch_transcript(video_url)
     except Exception as e:
         yield gr.update(visible=True, value=f"Error fetching transcript: {e}"), ""
         return
@@ -134,20 +116,23 @@ def summarize_url(url: str):
 
 
 def build_ui():
+    videos = fetch_broadcasts(CHANNEL_HANDLE, max_results=14)
+    initial_choices = [(f"{v['title']} ({v['video_id']})", v['video_id']) for v in videos]
+
     with gr.Blocks(title="ParlamentAI Minutes Generator") as iface:
         gr.Markdown("# ParlamentAI Minutes Generator")
-        gr.Markdown("Enter a YouTube URL to fetch the transcript and generate meeting minutes.")
+        gr.Markdown("Latest recent videos from @OrszaggyulesELO")
 
         with gr.Row():
             with gr.Column(scale=1):
-                url_input = gr.Textbox(lines=1, placeholder="Enter YouTube URL or video id", label="YouTube URL")
-                status_box = gr.Textbox(label="Status", interactive=False, visible=False)
+                video_select = gr.Dropdown(label="Select a video", choices=initial_choices, value=initial_choices[0][1] if initial_choices else None)
+                status_box = gr.Textbox(label="Status", interactive=False)
                 submit_btn = gr.Button("Generate Summary", variant="primary")
 
             with gr.Column(scale=2):
                 summary_box = gr.Markdown(label="Minutes")
 
-        submit_btn.click(fn=summarize_url, inputs=url_input, outputs=[status_box, summary_box])
+        submit_btn.click(fn=summarize_url, inputs=video_select, outputs=[status_box, summary_box])
 
     return iface
 
