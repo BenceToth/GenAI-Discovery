@@ -94,10 +94,16 @@ def summarize_url(video_id: str):
     yield gr.update(visible=True, value="Fetching transcript..."), ""
     try:
         transcript = fetch_transcript(video_url)
+        
+        # limit size to avoid token issues
+        if len(transcript) > 12000:
+            transcript = transcript[:12000] + "\n\n[Truncated transcript due to length]"
+        
     except Exception as e:
         yield gr.update(visible=True, value=f"Error fetching transcript: {e}"), ""
         return
 
+    # Generate minutes and stream back results
     yield gr.update(visible=True, value="Generating minutes (this may take a moment)..."), ""
     try:
         minutes_parts = []
@@ -117,7 +123,7 @@ def summarize_url(video_id: str):
 
 def build_ui():
     videos = fetch_broadcasts(CHANNEL_HANDLE, max_results=14)
-    initial_choices = [(f"{v['title']} ({v['video_id']})", v['video_id']) for v in videos]
+    initial_choices = [(v['title'], v['video_id']) for v in videos]
 
     with gr.Blocks(title="ParlamentAI Minutes Generator") as iface:
         gr.Markdown("# ParlamentAI Minutes Generator")
@@ -125,7 +131,7 @@ def build_ui():
 
         with gr.Row():
             with gr.Column(scale=1):
-                video_select = gr.Dropdown(label="Select a video", choices=initial_choices, value=initial_choices[0][1] if initial_choices else None)
+                video_select = gr.Dropdown(label="Select a video", choices=initial_choices, value=initial_choices[0][1])
                 status_box = gr.Textbox(label="Status", interactive=False)
                 submit_btn = gr.Button("Generate Summary", variant="primary")
 

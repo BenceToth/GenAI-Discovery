@@ -71,22 +71,13 @@ def fetch_broadcasts(channel_handle: str, max_results: int = 14) -> list[dict]:
 
     return []
 
-def extract_video_id(url: str) -> str:
-    """Extract YouTube video id from a URL or return the text if it's already an id."""
-    if not url:
-        raise ValueError("Empty URL")
-    # Original notebook logic: take 11 chars after 'v='
-    if 'v=' in url:
-        idx = url.split('v=')[1]
-        return idx[:11]
-    # fallback: if it's already 11 chars assume it's the id
-    if len(url.strip()) == 11:
-        return url.strip()
-    raise ValueError("Could not extract a YouTube video id from the provided URL. Provide a URL containing 'v=' or the 11-char id.")
-
 def fetch_transcript(video_url: str) -> str:
     """Fetches the transcript for a given YouTube video URL."""
-    video_id = extract_video_id(video_url)
+    
+    # 11 chars after 'v=' in the URL is the video ID
+    video_id = video_url.split('v=')[1][:11]
+    
+    # create YT object and fetch transcript
     yt = YouTubeTranscriptApi()
     transcripts = yt.list(video_id=video_id)
     if not transcripts:
@@ -99,7 +90,4 @@ def fetch_transcript(video_url: str) -> str:
     
     full_transcript_text = " ".join([entry.text for entry in transcript_data])
     
-    # limit size to avoid token issues
-    if len(full_transcript_text) > 12000:
-        full_transcript_text = full_transcript_text[:12000] + "\n\n[Truncated transcript due to length]"
     return full_transcript_text
