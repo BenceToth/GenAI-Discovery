@@ -95,10 +95,6 @@ def summarize_url(video_id: str):
     try:
         transcript = fetch_transcript(video_url)
         
-        # limit size to avoid token issues
-        if len(transcript) > 12000:
-            transcript = transcript[:12000] + "\n\n[Truncated transcript due to length]"
-        
     except Exception as e:
         yield gr.update(visible=True, value=f"Error fetching transcript: {e}"), ""
         return
