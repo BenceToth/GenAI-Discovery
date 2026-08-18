@@ -1,5 +1,6 @@
 import os
 import re
+import spaces
 from dotenv import load_dotenv
 from youtube_transcript_api import YouTubeTranscriptApi
 from openai import OpenAI
@@ -29,6 +30,7 @@ MODEL_HF = "deepseek-ai/DeepSeek-V3"
 # YouTube channel to fetch videos from. This is the official channel of the Hungarian Parliament.
 CHANNEL_HANDLE = "@OrszaggyulesELO"
 
+@spaces.GPU
 def generate_minutes(transcript: str):
     system_message = (
         "You produce minutes of meetings from transcripts. "
