@@ -71,23 +71,44 @@ def fetch_broadcasts(channel_handle: str, max_results: int = 14) -> list[dict]:
 
     return []
 
+TRANSCRIPT_CACHE_DIR = os.path.join(os.path.dirname(__file__), "transcripts")
+
+
+def _cache_path(video_id: str) -> str:
+    return os.path.join(TRANSCRIPT_CACHE_DIR, f"{video_id}.txt")
+
+
 def fetch_transcript(video_url: str) -> str:
-    """Fetches the transcript for a given YouTube video URL."""
-    
+    """Fetches the transcript for a given YouTube video URL, preferring a locally cached copy.
+
+    YouTube blocks most cloud-provider IPs from fetching transcripts directly, so on a hosted
+    Space this only works for videos whose transcript was pre-fetched from a non-cloud IP and
+    committed to TRANSCRIPT_CACHE_DIR (see cache_transcripts.py).
+    """
+
     # 11 chars after 'v=' in the URL is the video ID
     video_id = video_url.split('v=')[1][:11]
-    
+
+    cache_path = _cache_path(video_id)
+    if os.path.exists(cache_path):
+        with open(cache_path, "r", encoding="utf-8") as f:
+            return f.read()
+
     # create YT object and fetch transcript
     yt = YouTubeTranscriptApi()
     transcripts = yt.list(video_id=video_id)
     if not transcripts:
         raise RuntimeError("No transcripts available for this video")
-    
+
     # get first language code and fetch transcript
     lang_code = list(transcripts)[0].language_code
     transcript_obj = transcripts.find_transcript([lang_code])
     transcript_data = transcript_obj.fetch()
-    
+
     full_transcript_text = " ".join([entry.text for entry in transcript_data])
-    
+
+    os.makedirs(TRANSCRIPT_CACHE_DIR, exist_ok=True)
+    with open(cache_path, "w", encoding="utf-8") as f:
+        f.write(full_transcript_text)
+
     return full_transcript_text
