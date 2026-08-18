@@ -1,5 +1,7 @@
 # ParlamentAI
 
+Try the live demo on Hugging Face Spaces: https://huggingface.co/spaces/BenToT360/ParlamentAI
+
 ParlamentAI is a small workflow for fetching Hungarian parliamentary YouTube videos, extracting transcripts, and generating concise meeting minutes with OpenAI. The project includes a notebook, a scraper-based prototype, and lightweight web UIs for local and hosted demos.
 
 ## Project files
