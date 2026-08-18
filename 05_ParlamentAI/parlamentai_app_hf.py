@@ -10,8 +10,7 @@ from youtube_scraper import fetch_broadcasts, fetch_transcript
 
 # Load APIs from .env
 BASE_DIR = os.path.dirname(__file__)
-PARENT_ENV = os.path.join(os.path.dirname(BASE_DIR), ".env")
-load_dotenv(dotenv_path=PARENT_ENV, override=True)
+load_dotenv(dotenv_path=os.path.join(BASE_DIR, ".env"), override=True)
 
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 HF_TOKEN = os.getenv("HF_TOKEN")
@@ -25,7 +24,7 @@ if not HF_TOKEN:
 # Hugging Face's Inference Providers router exposes an OpenAI-compatible API,
 # so the same OpenAI SDK works here - only the base_url, key, and model change.
 client = OpenAI(base_url="https://router.huggingface.co/v1", api_key=HF_TOKEN)
-MODEL_HF = "meta-llama/Llama-3.1-8B-Instruct"
+MODEL_HF = "deepseek-ai/DeepSeek-V3"
 
 # YouTube channel to fetch videos from. This is the official channel of the Hungarian Parliament.
 CHANNEL_HANDLE = "@OrszaggyulesELO"
