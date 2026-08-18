@@ -6,7 +6,7 @@ from youtube_transcript_api import YouTubeTranscriptApi
 from openai import OpenAI
 import gradio as gr
 
-from youtube_scraper import fetch_broadcasts, fetch_transcript
+from youtube_scraper import fetch_broadcasts, fetch_transcript, cached_video_ids
 
 
 # Load APIs from .env
@@ -122,6 +122,14 @@ def summarize_url(video_id: str):
 
 def build_ui():
     videos = fetch_broadcasts(CHANNEL_HANDLE, max_results=14)
+
+    # Restrict the dropdown to videos with a cached transcript, since live transcript
+    # fetches don't work from the Space (YouTube blocks cloud-provider IPs). Falls back
+    # to the full list if nothing has been cached yet (e.g. in local development).
+    cached_ids = cached_video_ids()
+    cached_videos = [v for v in videos if v['video_id'] in cached_ids]
+    videos = cached_videos or videos
+
     initial_choices = [(v['title'], v['video_id']) for v in videos]
 
     with gr.Blocks(title="ParlamentAI Minutes Generator") as iface:

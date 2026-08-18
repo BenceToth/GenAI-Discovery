@@ -78,6 +78,13 @@ def _cache_path(video_id: str) -> str:
     return os.path.join(TRANSCRIPT_CACHE_DIR, f"{video_id}.txt")
 
 
+def cached_video_ids() -> set[str]:
+    """Returns the video IDs that already have a cached transcript on disk."""
+    if not os.path.isdir(TRANSCRIPT_CACHE_DIR):
+        return set()
+    return {os.path.splitext(f)[0] for f in os.listdir(TRANSCRIPT_CACHE_DIR) if f.endswith(".txt")}
+
+
 def fetch_transcript(video_url: str) -> str:
     """Fetches the transcript for a given YouTube video URL, preferring a locally cached copy.
 
